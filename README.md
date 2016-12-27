@@ -9,10 +9,7 @@ Some benchmark scripts for [MXNet](http://mxnet.io)
    contains the hostname or the IP of a worker. It is only required for benchmarking
    distributed performance
 3. For a task `A`, use `run_A.sh` to benchmark. Results are saved in `log/`. To
-   benchmark multiple times we can
-   ```bash
-   for i in {1..10}; do ./run_A.sh; done
-   ```
+   benchmark 10 times we can `./repeat.sh 10 ./run_A.sh`
 4. Use `python parse_A.py` to parse the results.
 
 
