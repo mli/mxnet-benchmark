@@ -21,6 +21,6 @@ for network in alexnet resnet inception-v3; do
         python train_imagenet.py --benchmark 1 --batch-size $bs \
             --gpus 0 --network $network --image-shape $shape --num-epochs 1 \
             --num-layers 152 \
-            2>&1 | tee $LOG/${network}-${bs}
+            2>&1 | tee $LOG/${network}_${bs}
     done
 done

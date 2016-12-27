@@ -1,22 +1,30 @@
 import re
+import glob
+from common import match_res, stats
 
-log = "vary_batch/log"
+def parse(fname, data):
+    print 'parsing ' + fname
+    exp = re.compile('.*40.*Speed: ([.\d]+)')
+    res = match_res(fname, exp)
+    (net, bs) = fname.split('/')[-1].split('_')
+    bs = int(bs)
+    if net not in data:
+        data[net] = {}
+    if bs not in data[net]:
+        data[net][bs] = []
+    data[net][bs] += [float(e[0]) for e in res]
 
-f = open(log, "r")
+def parse_all(dirname, data):
+    for fn in glob.glob(dirname+'/*'):
+        parse(fn, data)
 
-network = ''
-head=re.compile('.*batch_size=([\d]+).*network=\'([\w-]*)\'.*')
-body=re.compile('.*40.*Speed: ([.\d]+)')
+data = {}
+for i in glob.glob('log/vary_batch-*'):
+    parse_all(i, data)
 
-batch = 'xx'
-for l in f:
-    m = head.match(l)
-    if m is not None:
-        if m.groups()[1] != network:
-            print '==== ' + m.groups()[1] + ' ===='
-            print 'batch\timg/sec'
-            network = m.groups()[1]
-        batch = m.groups()[0]
-    m = body.match(l)
-    if m is not None:
-        print batch + '\t' + m.groups()[0]
+for d in data:
+    print '=== network : ' + d + ' ==='
+    print 'batch\timages/sec'
+    for b in sorted(data[d]):
+        v = stats(data[d][b])
+        print('%s\t%.2f (+- %.2f)' % (b, v[0], v[1]))
