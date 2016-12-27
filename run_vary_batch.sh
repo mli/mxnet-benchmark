@@ -1,12 +1,11 @@
 #!/bin/bash
 
-mx_root=../mxnet
-mkdir -p vary_batch
-log=`pwd`/"vary_batch/log"
+source common.sh
 
-rm -rf $log
-touch $log
-cd ${mx_root}/example/image-classification/
+LOG=`pwd`/log/vary_batch
+new_log_dir $LOG
+
+cd ${MX_ROOT}/example/image-classification/
 
 for network in alexnet resnet inception-v3; do
     if [ "$network" == "inception-v3" ]; then
@@ -19,9 +18,9 @@ for network in alexnet resnet inception-v3; do
         if [ "$network" == "alexnet" ]; then
             bs=$((bs*16))
         fi
-        echo "network = $network, batch size = $bs"
         python train_imagenet.py --benchmark 1 --batch-size $bs \
             --gpus 0 --network $network --image-shape $shape --num-epochs 1 \
-            2>&1 | tee -a $log
+            --num-layers 152 \
+            2>&1 | tee $LOG/${network}-${bs}
     done
 done
